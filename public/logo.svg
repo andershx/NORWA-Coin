@@ -1,0 +1,15 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="NORWA Coin logo">
+  <defs>
+    <linearGradient id="r" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b6b"/>
+      <stop offset="50%" stop-color="#ff3b3b"/>
+      <stop offset="100%" stop-color="#ff1a75"/>
+    </linearGradient>
+  </defs>
+  <!-- Hex shield + stylized N monogram (original), red gradient strokes -->
+  <g>
+    <path d="M128 12 224 64v128l-96 52-96-52V64z" fill="#0f1520" stroke="url(#r)" stroke-width="8"/>
+    <path d="M88 176V80l80 96V80" fill="none" stroke="url(#r)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <circle cx="128" cy="128" r="120" fill="none" stroke="url(#r)" stroke-opacity=".22" stroke-width="8"/>
+</svg>
