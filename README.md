@@ -1,13 +1,18 @@
-# NORWA Buy Button Patch
+# NORWA Tailwind Fix Patch
 
-Denne patchen gjør to ting:
-1. Legger til `ethers` i `package.json` slik at Vercel kan bygge.
-2. Flytter `BuyNorwaButton.tsx` til `components/`-mappen.
+This patch restores Tailwind CSS so Vercel can build.
 
-## Bruk:
-1. Pakk ut ZIP-filen.
-2. Last opp `package.json` og `components/BuyNorwaButton.tsx` til roten av GitHub-prosjektet ditt (overskriv hvis nødvendig).
-3. Commit og push.
-4. Vercel vil bygge prosjektet med knappen.
+## Included
+- package.json (adds Tailwind, PostCSS, Autoprefixer, TypeScript types)
+- tailwind.config.js
+- postcss.config.js
 
-Husk å bytte ut `SALE_ADDRESS` i `components/BuyNorwaButton.tsx` med adressen til din NorwaSale-kontrakt.
+## How to use
+1. Upload all files in this zip to the ROOT of your GitHub repo.
+2. Commit changes.
+3. Vercel will rebuild without the Tailwind error.
+
+Ensure your app/globals.css has:
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
