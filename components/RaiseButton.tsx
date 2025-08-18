@@ -77,7 +77,7 @@ export default function RaiseButton() {
             ${total.toLocaleString()}
           </div>
           <div className="text-xs mt-2" style={{color:'var(--muted)'}}>
-            Starts at $158,350 and updates automatically when new payments complete.
+            Funds raised from investors to help build the RWA platform. 
           </div>
         </div>
       </div>
