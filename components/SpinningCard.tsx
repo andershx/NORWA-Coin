@@ -1,50 +1,17 @@
 'use client';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
 
 export default function SpinningCard() {
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  // Optional: tiny tilt on mouse to add parallax without breaking the spin
-  useEffect(() => {
-    const el = cardRef.current;
-    if (!el) return;
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const x = (e.clientX - (r.left + r.width / 2)) / r.width;
-      const y = (e.clientY - (r.top + r.height / 2)) / r.height;
-      el.style.setProperty('--tiltX', `${Math.max(Math.min(-y * 6, 6), -6)}deg`);
-      el.style.setProperty('--tiltY', `${Math.max(Math.min(x * 8, 8), -8)}deg`);
-    };
-    const onLeave = () => {
-      el.style.setProperty('--tiltX', `0deg`);
-      el.style.setProperty('--tiltY', `0deg`);
-    };
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseleave', onLeave);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mouseleave', onLeave);
-    };
-  }, []);
-
   return (
     <div className="wrap" aria-label="Spinning NORWA credit card">
       <div className="stage">
-        <div className="card3d" ref={cardRef}>
-          {/* BASE CARD FACE */}
-          <div className="face">
-            {/* Layer 1: deep red paint (anisotropic metallic look) */}
+        <div className="card3d">
+          {/* FRONT */}
+          <div className="face front">
             <div className="paint" />
-            {/* Layer 2: brushed subtle texture */}
-            <div className="brushed" />
-            {/* Layer 3: dynamic environment reflection */}
-            <div className="env" />
-            {/* Layer 4: moving sheen sweep */}
+            <div className="rim" />
+            <div className="foil" />
             <div className="sheen" />
-            {/* Layer 5: specular glints near edges */}
-            <div className="glints" />
-            {/* Content */}
             <div className="content">
               <div className="row top">
                 <span className="brand">NORWA</span>
@@ -68,10 +35,10 @@ export default function SpinningCard() {
             </div>
           </div>
 
-          {/* BACK FACE (subtle reflection when rotating past 90°) */}
+          {/* BACK */}
           <div className="face back" aria-hidden="true">
             <div className="paint backTone" />
-            <div className="env backEnv" />
+            <div className="rim" />
             <div className="magstripe" />
             <div className="backtxt">NORWA • Secure • Transparent • Global</div>
           </div>
@@ -79,101 +46,83 @@ export default function SpinningCard() {
       </div>
 
       <style jsx>{`
-        /* Scene */
-        .wrap { display:flex; justify-content:center; align-items:center; padding:14px; }
-        .stage { perspective: 1400px; }
+        /* Smooth variable rotation (prevents transform jitter) */
+        @property --ry { syntax: '<number>'; inherits: false; initial-value: 0; }
+        @property --lx { syntax: '<number>'; inherits: false; initial-value: 20; } /* light x */
+        @property --ly { syntax: '<number>'; inherits: false; initial-value: 40; } /* light y */
 
-        /* 3D object */
-        .card3d {
+        .wrap { display:flex; justify-content:center; align-items:center; padding:16px; }
+        .stage { perspective: 1600px; }
+
+        .card3d{
+          --ry: 0;
           position: relative;
           width: 360px; height: 226px;
           transform-style: preserve-3d;
-          animation: spin 12s cubic-bezier(.4,.02,.2,1) infinite;
-          filter: drop-shadow(0 30px 40px rgba(0,0,0,.45));
-          transform: rotateX(var(--tiltX, 0deg)) rotateY(var(--tiltY, 0deg));
+          transform: rotateX(8deg) rotateY(calc(var(--ry) * 1deg));
+          animation: spin 12s linear infinite forwards, lights 6s ease-in-out infinite alternate;
+          filter: drop-shadow(0 36px 40px rgba(0,0,0,.45));
         }
-        .face {
-          position: absolute; inset: 0;
-          border-radius: 20px; overflow: hidden;
+
+        /* Faces */
+        .face{
+          position:absolute; inset:0; border-radius:20px; overflow:hidden;
           backface-visibility: hidden;
           box-shadow:
             inset 0 0 0 1px rgba(255,255,255,.06),
-            0 10px 30px rgba(0,0,0,.35);
-          transform: translateZ(0.1px); /* prevents z-fighting */
+            0 8px 22px rgba(0,0,0,.28);
         }
-        .face.back {
-          transform: rotateY(180deg);
+        .back{ transform: rotateY(180deg); }
+
+        /* Metallic red paint with coordinated highlight using --ry */
+        .paint, .paint.backTone{
+          position:absolute; inset:-1px; border-radius:22px;
+          background:
+            radial-gradient(110% 90% at calc(var(--lx)*1%) calc(var(--ly)*1%), rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
+            linear-gradient(135deg, #8f0d27 0%, #c61637 32%, #ff2a4d 55%, #b31332 78%, #661022 100%);
+        }
+        .paint.backTone{
+          background:
+            radial-gradient(100% 80% at calc((100 - var(--lx))*1%) calc((100 - var(--ly))*1%), rgba(255,255,255,.12), rgba(255,255,255,0) 60%),
+            linear-gradient(135deg, #5b0d1d 0%, #95112c 40%, #d01b41 70%, #7a0f26 100%);
         }
 
-        /* Metallic red base: richer and deeper */
-        .paint, .paint.backTone {
-          position:absolute; inset:-1px; border-radius: 22px;
-          background:
-            radial-gradient(160% 120% at 80% 10%, rgba(255,255,255,.14) 0%, transparent 60%),
-            linear-gradient(135deg, #9a0f2d 0%, #ce173c 30%, #ff2a4d 55%, #b01333 78%, #6f0d22 100%);
-        }
-        /* Slightly darker on the back */
-        .paint.backTone {
-          background:
-            radial-gradient(140% 100% at 20% 80%, rgba(255,255,255,.08) 0%, transparent 60%),
-            linear-gradient(135deg, #6f0d22 0%, #a41231 40%, #d51d43 65%, #8a0f28 100%);
+        /* Subtle rim to add thickness */
+        .rim{
+          position:absolute; inset:0; border-radius:20px; pointer-events:none;
+          box-shadow:
+            inset 0 0 0 1px rgba(255,255,255,.10),
+            inset 0 0 0 2px rgba(0,0,0,.22);
         }
 
-        /* Brushed texture (very subtle, for realism) */
-        .brushed {
-          position:absolute; inset:0; mix-blend-mode:overlay; opacity:.18;
+        /* Holographic foil specks for realism */
+        .foil{
+          position:absolute; inset:0; mix-blend-mode:screen; opacity:.35; pointer-events:none;
           background:
-            repeating-linear-gradient( 90deg,
-              rgba(255,255,255,.08) 0px, rgba(255,255,255,.08) 1px,
-              rgba(0,0,0,0) 2px, rgba(0,0,0,0) 5px
-            );
-          filter: blur(.3px);
+            radial-gradient(6px 2px at 12% 18%, rgba(255,255,255,.5), rgba(255,255,255,0) 70%),
+            radial-gradient(10px 3px at 82% 16%, rgba(255,255,255,.32), rgba(255,255,255,0) 70%),
+            radial-gradient(8px 3px at 72% 78%, rgba(255,255,255,.28), rgba(255,255,255,0) 70%);
+          filter: blur(.2px);
+          animation: foilPulse 5.4s ease-in-out infinite;
         }
 
-        /* Environment reflection: moves during spin to mimic lights */
-        .env, .env.backEnv {
-          position:absolute; inset:-10%; pointer-events:none;
+        /* Moving sheen strip synced to rotation */
+        .sheen{
+          position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
           background:
-            linear-gradient( to bottom, rgba(255,255,255,.28), rgba(255,255,255,0) 60%),
-            linear-gradient( to right, rgba(255,255,255,.12), rgba(255,255,255,0) 40%),
-            radial-gradient(60% 160% at 0% 0%, rgba(255,255,255,.18), rgba(255,255,255,0) 60% ),
-            radial-gradient(80% 120% at 120% 120%, rgba(255,255,255,.12), rgba(255,255,255,0) 70% );
-          mix-blend-mode: screen;
-          opacity:.8;
-          animation: envShift 12s linear infinite;
-        }
-        .env.backEnv { opacity:.6; filter: blur(1px); }
-
-        /* Sheen sweep across the surface */
-        .sheen {
-          position:absolute; inset:0; pointer-events:none;
-          background:
-            linear-gradient( 105deg,
+            linear-gradient( 100deg,
               rgba(255,255,255,0) 0%,
-              rgba(255,255,255,.18) 45%,
-              rgba(255,255,255,0) 55%
+              rgba(255,255,255,.16) 50%,
+              rgba(255,255,255,0) 100%
             );
-          mix-blend-mode: screen;
-          transform: translateX(-120%);
-          animation: sheenMove 6s ease-in-out infinite;
-        }
-
-        /* Tiny edge glints for *real* metal feeling */
-        .glints {
-          position:absolute; inset:0; pointer-events:none;
-          background:
-            radial-gradient(40px 10px at 15% 8%, rgba(255,255,255,.35), rgba(255,255,255,0) 60%),
-            radial-gradient(60px 14px at 85% 16%, rgba(255,255,255,.22), rgba(255,255,255,0) 65%),
-            radial-gradient(30px 10px at 90% 80%, rgba(255,255,255,.18), rgba(255,255,255,0) 60%);
-          mix-blend-mode: screen;
-          opacity:.55;
-          animation: glintPulse 4.8s ease-in-out infinite;
+          transform: translateX(calc((var(--ry) - 180) * 0.9%)) rotate(2deg);
+          opacity:.65;
         }
 
         .content { position:relative; display:flex; flex-direction:column; height:100%; z-index:5; }
         .row { display:flex; align-items:center; }
         .row.top { justify-content:space-between; padding:16px 18px 0 18px; }
-        .brand { letter-spacing:.24em; font-weight:800; font-size:14px; color:#fff; text-shadow:0 0 18px rgba(255,64,64,.28) }
+        .brand { letter-spacing:.24em; font-weight:800; font-size:14px; color:#fff; text-shadow:0 0 16px rgba(255,64,64,.24) }
         .number {
           margin:24px 18px 0 18px; font-size:22px; letter-spacing:.1em;
           color:#fff; font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,.45)
@@ -187,52 +136,37 @@ export default function SpinningCard() {
         }
         .chip-line { height:2px; background:rgba(0,0,0,.35); border-radius:1px }
         .holder,.expiry{ display:flex; flex-direction:column; align-items:flex-start }
-        .label{ font-size:10px; color:rgba(255,255,255,.70); letter-spacing:.12em; text-transform:uppercase }
+        .label{ font-size:10px; color:rgba(255,255,255,.75); letter-spacing:.12em; text-transform:uppercase }
         .value{ font-size:14px; color:#fff; font-weight:700; margin-top:2px }
 
-        /* Back face elements */
+        /* Back face */
         .magstripe {
           position:absolute; left:0; right:0; top:26px; height:44px;
           background: linear-gradient(180deg, #0b0b0b, #232323);
-          opacity:.9;
+          opacity:.92;
         }
         .backtxt {
           position:absolute; bottom:16px; right:18px;
-          color: rgba(255,255,255,.8); font-size:12px; letter-spacing:.08em;
+          color: rgba(255,255,255,.82); font-size:12px; letter-spacing:.08em;
         }
 
-        /* Animations */
-        @keyframes spin {
-          0%   { transform: rotateX(var(--tiltX,0deg)) rotateY(calc(var(--tiltY,0deg) +   0deg)); }
-          25%  { transform: rotateX(calc(var(--tiltX,0deg) + 2deg)) rotateY(calc(var(--tiltY,0deg) +  90deg)); }
-          50%  { transform: rotateX(calc(var(--tiltX,0deg) + 0deg)) rotateY(calc(var(--tiltY,0deg) + 180deg)); }
-          75%  { transform: rotateX(calc(var(--tiltX,0deg) - 2deg)) rotateY(calc(var(--tiltY,0deg) + 270deg)); }
-          100% { transform: rotateX(var(--tiltX,0deg)) rotateY(calc(var(--tiltY,0deg) + 360deg)); }
+        /* Motion + light animations */
+        @keyframes spin { to { --ry: 360; } }
+        @keyframes lights {
+          0%   { --lx: 18; --ly: 42; }
+          50%  { --lx: 82; --ly: 22; }
+          100% { --lx: 30; --ly: 70; }
         }
-        @keyframes envShift {
-          0% { transform: translate(-4%, -2%) scale(1.02) }
-          50%{ transform: translate(4%, 2%) scale(1.02) }
-          100%{ transform: translate(-4%, -2%) scale(1.02) }
-        }
-        @keyframes sheenMove {
-          0% { transform: translateX(-130%) rotate(2deg); opacity:.0 }
-          20%{ transform: translateX(0%) rotate(2deg); opacity:.65 }
-          40%{ transform: translateX(130%) rotate(2deg); opacity:0 }
-          100%{ transform: translateX(130%) rotate(2deg); opacity:0 }
-        }
-        @keyframes glintPulse {
-          0%,100% { opacity:.45 }
-          50% { opacity:.75 }
-        }
+        @keyframes foilPulse { 0%,100%{opacity:.28} 50%{opacity:.4} }
 
-        /* Accessibility: reduce motion */
+        /* Reduce motion */
         @media (prefers-reduced-motion: reduce) {
-          .card3d { animation: none; }
-          .env, .sheen, .glints { animation: none; }
+          .card3d { animation: none; transform: rotateX(6deg) rotateY(12deg); }
+          .sheen, .foil { animation: none; }
         }
 
-        @media (max-width: 420px) {
-          .card3d { width:300px; height:188px }
+        @media (max-width:420px){
+          .card3d{ width:300px;height:188px }
           .number{ font-size:20px }
         }
       `}</style>
