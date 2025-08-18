@@ -5,20 +5,53 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ConnectButton from '@/components/ConnectButton';
 
-export default function Home(){return(<main>
-<header className="sticky top-0 z-10 backdrop-blur border-b border-[#232a3d] bg-[#0f1520]/60"><div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
-<Link href="#" className="flex items-center gap-2 font-bold"><Image src="/logo.svg" alt="NORWA" width={32} height={32}/><span>NORWA Coin</span></Link>
-<nav aria-label="Main navigation" className="hidden md:block"><a href="#om" className="nav-a">About</a><a href="#rwa" className="nav-a">RWA</a><a href="#tokenomics" className="nav-a">Tokenomics</a><a href="#veikart" className="nav-a">Roadmap</a><a href="#faq" className="nav-a">FAQ</a></nav>
-<ConnectButton/></div></header>
-<section className="hero-grid"><div><h1 className="text-4xl md:text-6xl font-extrabold leading-tight">Tokenize real‑world assets. <span className="grad">Secure. Transparent. Global.</span></h1>
-<p className="mt-4 text-lg" style={{color:'var(--muted)'}}>NORWA Coin lets investors own and trade fractions of real‑world assets (RWA) — with on‑chain proofs and clear governance on <strong>Solana</strong>.</p>
-<div className="flex gap-3 mt-6"><a className="btn btn-primary" href="#om">Get started</a><a className="btn btn-ghost" href="#whitepaper">Read the whitepaper (soon)</a></div>
-<div className="flex gap-2 mt-6 flex-wrap" style={{color:'var(--muted)'}}><span className="border border-[#26304a] rounded-full px-2.5 py-1 text-sm">Solana‑native</span><span className="border border-[#26304a] rounded-full px-2.5 py-1 text-sm">On‑chain proofs</span><span className="border border-[#26304a] rounded-full px-2.5 py-1 text-sm">KYC/AML‑ready</span></div></div>
-<div className="relative h-72 md:h-96" aria-hidden="true"><div className="absolute -top-2 left-10 w-56 h-56 rounded-full blur-3xl opacity-80" style={{background:'radial-gradient(circle,#ffffff,#ffb3b3 35%,transparent 65%)'}}/><div className="absolute bottom-2 right-2 w-72 h-72 rounded-full blur-3xl opacity-80" style={{background:'radial-gradient(circle,#ffffff,#ff6b6b 35%,transparent 70%)'}}/><div className="absolute top-1/2 left-1/3 w-44 h-44 rounded-full blur-2xl opacity-80" style={{background:'radial-...
-<section id="om" className="section"><div className="grid md:grid-cols-2 gap-6"><div><h2 className="text-3xl font-bold">Why NORWA?</h2><p className="mt-2" style={{color:'var(--muted)'}}>An original RWA ecosystem focused on clear ownership, auditable attestations, and liquidity through open protocols.</p><ul className="mt-4 space-y-2"><li>✓ Attestations and oracles for verifiable value</li><li>✓ Liquidity via DEX pools and permissioned marketplaces</li><li>✓ Compliance‑friendly token standards and whiteli...
-<section id="rwa" className="section section-alt"><h2 className="text-3xl font-bold mb-6">How RWA works at NORWA</h2><div className="grid md:grid-cols-3 gap-5"><div className="tile"><h3 className="font-semibold text-xl">1. Verify the asset</h3><p>The asset is documented and attested. Evidence is linked on‑chain.</p></div><div className="tile"><h3 className="font-semibold text-xl">2. Tokenize</h3><p>Rule‑based tokens (ownership, transfer, whitelist) are issued on‑chain.</p></div><div className="tile"><h3 ...
-<section id="tokenomics" className="section"><h2 className="text-3xl font-bold mb-6">Tokenomics</h2><div className="grid md:grid-cols-2 gap-6"><div><p style={{color:'var(--muted)'}}>NORWA is used for fees and governance across the ecosystem. RWA shares are issued separately as compliance tokens.</p><ul className="mt-4 space-y-2"><li className="relative border border-[#2a3148] rounded-lg bg-[#111827] px-3 py-2"><span className="absolute inset-y-0 left-0 w-[28%] bg-gradient-to-r from-[var(--r1)] to-[var(--...
-<section id="veikart" className="section section-alt"><h2 className="text-3xl font-bold mb-6">Roadmap</h2><ol className="space-y-3"><li className="border border-dashed border-[#353950] rounded-xl bg-[#0f1422] px-4 py-3"><strong>Q1:</strong> Concept, entity, legal</li><li className="border border-dashed border-[#353950] rounded-xl bg-[#0f1422] px-4 py-3"><strong>Q2:</strong> Smart contracts, KYC, internal test</li><li className="border border-dashed border-[#353950] rounded-xl bg-[#0f1422] px-4 py-3"><str...
-<section id="faq" className="section"><h2 className="text-3xl font-bold mb-4">FAQ</h2><details className="mb-2"><summary className="cursor-pointer">Is NORWA a security or a utility token?</summary><p style={{color:'var(--muted)'}}>NORWA is used for fees and governance. RWA shares may be deemed securities and are issued separately under applicable rules.</p></details><details className="mb-2"><summary className="cursor-pointer">Can I invest without KYC?</summary><p style={{color:'var(--muted)'}}>No — RWA‑...
-<footer className="py-10"><div className="max-w-5xl mx-auto px-5 grid md:grid-cols-2 gap-6"><div><strong>NORWA Coin</strong><p style={{color:'var(--muted)'}}>© {new Date().getFullYear()} NORWA Labs. Original content inspired by modern RWA platforms.</p></div><form className="grid grid-cols-[1fr_auto] gap-2"><label htmlFor="email" className="sr-only">Email</label><input id="email" type="email" placeholder="you@example.com" className="rounded-xl border border-[#28324d] bg-[#0e1422] px-3 py-2"/><button clas...
-</main>)}
+export default function Home() {
+  return (
+    <main>
+      <header className="sticky top-0 z-10 backdrop-blur border-b border-[#232a3d] bg-[#0f1520]/60">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
+          <Link href="#" className="flex items-center gap-2 font-bold">
+            <Image src="/logo.svg" alt="NORWA" width={32} height={32} />
+            <span>NORWA Coin</span>
+          </Link>
+          <nav aria-label="Main navigation" className="hidden md:block">
+            <a href="#about" className="nav-a">About</a>
+            <a href="#rwa" className="nav-a">RWA</a>
+            <a href="#tokenomics" className="nav-a">Tokenomics</a>
+            <a href="#roadmap" className="nav-a">Roadmap</a>
+            <a href="#faq" className="nav-a">FAQ</a>
+          </nav>
+          <ConnectButton />
+        </div>
+      </header>
+
+      <section className="hero-grid">
+        <div>
+          <h1 className="text-4xl md:text-6xl font-extrabold leading-tight">
+            Tokenize real-world assets. <span className="grad">Secure. Transparent. Global.</span>
+          </h1>
+          <p className="mt-4 text-lg" style={{ color: 'var(--muted)' }}>
+            NORWA Coin allows investors to own and trade fractions of real-world assets (RWA) – with on-chain proof and clear governance.
+          </p>
+          <div className="flex gap-3 mt-6">
+            <a className="btn btn-primary" href="#about">Get Started</a>
+            <a className="btn btn-ghost" href="#whitepaper">Read Whitepaper (coming soon)</a>
+          </div>
+          <div className="flex gap-2 mt-6 flex-wrap" style={{ color: 'var(--muted)' }}>
+            <span className="border border-[#26304a] rounded-full px-2.5 py-1 text-sm">Solana Network</span>
+            <span className="border border-[#26304a] rounded-full px-2.5 py-1 text-sm">On-chain Proof</span>
+            <span className="border border-[#26304a] rounded-full px-2.5 py-1 text-sm">KYC/AML Ready</span>
+          </div>
+        </div>
+        <div className="relative h-72 md:h-96" aria-hidden="true">
+          <div className="absolute -top-2 left-10 w-56 h-56 rounded-full blur-3xl opacity-80"
+            style={{ background: 'radial-gradient(circle,#ffffff,#ffb3b3 35%,transparent 65%)' }} />
+          <div className="absolute bottom-2 right-2 w-72 h-72 rounded-full blur-3xl opacity-80"
+            style={{ background: 'radial-gradient(circle,#ffffff,#ff6b6b 35%,transparent 70%)' }} />
+          <div className="absolute top-1/2 left-1/3 w-44 h-44 rounded-full blur-2xl opacity-80"
+            style={{ background: 'radial-gradient(circle,#ffffff,#ff1a75 35%,transparent 60%)' }} />
+        </div>
+      </section>
+    </main>
+  );
+}
