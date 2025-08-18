@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ConnectButton from '@/components/ConnectButton';
 import SpinningCard from '@/components/SpinningCard';
 import RwaShowcase from '@/components/RwaShowcase';
+import RaiseButton from '@/components/RaiseButton';
 
 export default function Home(){return(<main>
 <header className="sticky top-0 z-10 backdrop-blur border-b border-[#232a3d] bg-[#0f1520]/60"><div className="max-w-6xl mx-auto flex items-center justify-between px-5 py-3">
@@ -37,6 +38,9 @@ export default function Home(){return(<main>
 </section>
 
   <RwaShowcase />
+
+
+  <RaiseButton />
 
 
 <section id="om" className="section"><div className="grid md:grid-cols-2 gap-6"><div><h2 className="text-3xl font-bold">Why NORWA?</h2><p className="mt-2" style={{color:'var(--muted)'}}>An original RWA ecosystem focused on clear ownership, auditable attestations, and liquidity through open protocols.</p><ul className="mt-4 space-y-2"><li>✓ Attestations and oracles for verifiable value</li><li>✓ Liquidity via DEX pools and permissioned marketplaces</li><li>✓ Compliance‑friendly token standards and whitelist</li></ul></div><div className="card"><h3 className="text-xl font-semibold mb-2">Technical overview</h3><dl className="grid grid-cols-[130px_1fr] gap-x-4 gap-y-1 kv"><dt>Chain</dt><dd>Solana (primary)</dd><dt>Standard</dt><dd>SPL (utility), RWA standard TBA</dd><dt>Oracle</dt><dd>Chainlink (planned)</dd><dt>Custody</dt><dd>Third‑party with attestations (TBA)</dd></dl></div></div></section>
