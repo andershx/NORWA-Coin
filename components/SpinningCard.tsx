@@ -1,244 +1,174 @@
-/* eslint-disable @next/next/no-img-element */
-/* @ts-nocheck */
 'use client';
-
-import { useEffect, useRef } from 'react';
-import Script from 'next/script';
+import Image from 'next/image';
 
 export default function SpinningCard() {
-  const mountRef = useRef<HTMLDivElement>(null);
-  const readyRef = useRef(false);
-
-  useEffect(() => {
-    let disposed = false;
-    const tryInit = () => {
-      if (disposed) return;
-      const w = window as any;
-      if (w && w.THREE) init();
-      else setTimeout(tryInit, 50);
-    };
-    tryInit();
-
-    function init() {
-      if (readyRef.current) return;
-      readyRef.current = true;
-      const THREE = (window as any).THREE;
-      const mount = mountRef.current;
-      if (!mount) return;
-
-      const W = mount.clientWidth || 360;
-      const H = mount.clientHeight || 226;
-
-      // Renderer
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1.5, 2));
-      renderer.setSize(W, H);
-      renderer.outputColorSpace = THREE.SRGBColorSpace;
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.0;
-      mount.innerHTML = '';
-      mount.appendChild(renderer.domElement);
-
-      // Scene & camera
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(30, W / H, 0.1, 50);
-      camera.position.set(0.7, 0.45, 3.8);
-
-      // --- Environment (procedural) ---
-      const makeEnv = () => {
-        const c = document.createElement('canvas');
-        c.width = 1024; c.height = 512;
-        const ctx = c.getContext('2d');
-
-        if (ctx) {
-          const g = ctx.createLinearGradient(0, 0, 1024, 512);
-          g.addColorStop(0, '#1a0f14');     // dark red
-          g.addColorStop(0.35, '#3b0f1e');  // deeper red
-          g.addColorStop(0.6, '#0d0f16');   // dark blue-ish
-          g.addColorStop(1, '#101216');     // near-black
-          ctx.fillStyle = g;
-          ctx.fillRect(0, 0, c.width, c.height);
-
-          // soft vignettes
-          ctx.globalCompositeOperation = 'lighter';
-          for (let i=0;i<3;i++){
-            const cx = 200+i*300;
-            const cy = 120+i*120;
-            const rg = ctx.createRadialGradient(cx, cy, 20, cx, cy, 380);
-            rg.addColorStop(0, 'rgba(255,80,100,0.22)');
-            rg.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = rg;
-            ctx.beginPath(); ctx.arc(cx, cy, 380, 0, Math.PI*2); ctx.fill();
-          }
-        }
-
-        const tex = new THREE.CanvasTexture(c);
-        tex.mapping = THREE.EquirectangularReflectionMapping;
-        tex.colorSpace = THREE.SRGBColorSpace;
-        const pmrem = new THREE.PMREMGenerator(renderer);
-        const env = pmrem.fromEquirectangular(tex).texture;
-        tex.dispose();
-        pmrem.dispose();
-        return env;
-      };
-      scene.environment = makeEnv();
-
-      // Lights
-      const hemi = new THREE.HemisphereLight(0xff8899, 0x0b0b12, 0.6);
-      scene.add(hemi);
-      const key = new THREE.DirectionalLight(0xffffff, 2.0);
-      key.position.set(3, 4, 2.5);
-      scene.add(key);
-      const fill = new THREE.PointLight(0xff3355, 1.2, 10);
-      fill.position.set(-2.2, 1.0, 2.0);
-      scene.add(fill);
-      const rim = new THREE.DirectionalLight(0xffffff, 0.8);
-      rim.position.set(-3.0, 2.0, -3.5);
-      scene.add(rim);
-
-      // Geometry: rounded rectangle extruded
-      function roundedRectShape(w, h, r) {
-        const s = new THREE.Shape();
-        const x = -w / 2, y = -h / 2;
-        s.moveTo(x + r, y);
-        s.lineTo(x + w - r, y);
-        s.quadraticCurveTo(x + w, y, x + w, y + r);
-        s.lineTo(x + w, y + h - r);
-        s.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        s.lineTo(x + r, y + h);
-        s.quadraticCurveTo(x, y + h, x, y + h - r);
-        s.lineTo(x, y + r);
-        s.quadraticCurveTo(x, y, x + r, y);
-        return s;
-      }
-      const shape = roundedRectShape(3.2, 2.0, 0.18);
-      const extrude = new THREE.ExtrudeGeometry(shape, { steps: 1, depth: 0.06, bevelEnabled: false });
-      extrude.computeVertexNormals();
-
-      // Card material (PBR)
-      const materialFront = new THREE.MeshPhysicalMaterial({
-        color: 0xb31332,
-        metalness: 0.95,
-        roughness: 0.24,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.12,
-        sheen: 1.0,
-        sheenColor: new THREE.Color(0xff88a0),
-        envMapIntensity: 1.0,
-      });
-
-      const card = new THREE.Mesh(extrude, materialFront);
-
-      // Thin rim for depth cue
-      const rimGeo = extrude.clone();
-      const rimMat = new THREE.MeshStandardMaterial({ color: 0x4e0e1e, metalness: 0.8, roughness: 0.5 });
-      const rimMesh = new THREE.Mesh(rimGeo, rimMat);
-      rimMesh.scale.set(1.006, 1.006, 1.02);
-      card.add(rimMesh);
-
-      // Logo "foil" (uses /logo.svg). Slightly raised plane, metallic.
-      const loader = new THREE.TextureLoader();
-      loader.load('/logo.svg',
-        (tex) => {
-          tex.colorSpace = THREE.SRGBColorSpace;
-          const w = 0.42;
-          const plane = new THREE.Mesh(
-            new THREE.PlaneGeometry(w, w),
-            new THREE.MeshPhysicalMaterial({
-              map: tex,
-              transparent: true,
-              metalness: 0.9,
-              roughness: 0.18,
-              clearcoat: 1,
-              clearcoatRoughness: 0.1,
-              envMapIntensity: 1.2,
-            })
-          );
-          plane.position.set(0.0, 0.48, 0.032);
-          card.add(plane);
-        },
-        undefined,
-        () => { /* ignore load errors, card still renders */ }
-      );
-
-      // Micro-scratches normal (guard ctx)
-      const nCan = document.createElement('canvas');
-      nCan.width = nCan.height = 256;
-      const nctx = nCan.getContext('2d');
-      if (nctx) {
-        nctx.fillStyle = '#7f7fff';
-        nctx.fillRect(0,0,256,256);
-        nctx.globalAlpha = 0.1;
-        nctx.strokeStyle = '#8f8fff';
-        for (let i=0;i<220;i++){
-          const y = Math.random()*256;
-          nctx.beginPath(); nctx.moveTo(0,y); nctx.lineTo(256,y+(Math.random()*2-1)); nctx.stroke();
-        }
-      }
-      const normalTex = new THREE.CanvasTexture(nCan);
-      normalTex.wrapS = normalTex.wrapT = THREE.RepeatWrapping;
-      normalTex.repeat.set(2, 2);
-      materialFront.normalMap = normalTex;
-      materialFront.normalScale.set(0.25, 0.25);
-
-      // Scene hierarchy
-      const group = new THREE.Group();
-      group.add(card);
-      scene.add(group);
-      card.rotation.x = Math.PI * 0.03;
-      card.rotation.y = Math.PI * 0.08;
-
-      // Light rig that orbits for dynamic reflections
-      const lightRig = new THREE.Group();
-      lightRig.add(key, fill, rim);
-      scene.add(lightRig);
-
-      // Resize handling
-      const onResize = () => {
-        const w = mount.clientWidth || W, h = mount.clientHeight || H;
-        renderer.setSize(w, h);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-      };
-      const ro = new ResizeObserver(onResize);
-      ro.observe(mount);
-
-      // Animate
-      let t = 0, raf = 0;
-      const loop = () => {
-        t += 0.016;
-        group.rotation.y = t * 0.6;
-        lightRig.rotation.y = t * 0.8;
-        renderer.render(scene, camera);
-        raf = requestAnimationFrame(loop);
-      };
-      loop();
-
-      // Cleanup
-      const cleanup = () => {
-        cancelAnimationFrame(raf);
-        ro.disconnect();
-        renderer.dispose();
-        mount.innerHTML = '';
-      };
-      (mount as any).__cleanup = cleanup;
-    }
-
-    return () => {
-      disposed = true;
-      const mount = mountRef.current as any;
-      if (mount && mount.__cleanup) mount.__cleanup();
-    };
-  }, []);
-
   return (
-    <div className="wrap">
-      <Script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js" strategy="afterInteractive" />
-      <div ref={mountRef} className="canvasRoot" />
+    <div className="wrap" aria-label="Spinning NORWA credit card">
+      <div className="stage">
+        <div className="card3d">
+          {/* FRONT */}
+          <div className="face front">
+            <div className="paint" />
+            <div className="rim" />
+            <div className="foil" />
+            <div className="sheen" />
+            <div className="content">
+              <div className="row top">
+                <span className="brand">NORWA</span>
+                <Image src="/logo.svg" alt="NORWA Coin" width={40} height={40} />
+              </div>
+              <div className="number">5321&nbsp;&nbsp;8420&nbsp;&nbsp;0931&nbsp;&nbsp;2025</div>
+              <div className="row bottom">
+                <div className="chip" aria-hidden="true">
+                  <div className="chip-line" /><div className="chip-line" /><div className="chip-line" />
+                  <div className="chip-line" /><div className="chip-line" />
+                </div>
+                <div className="holder">
+                  <div className="label">Card Holder</div>
+                  <div className="value">NORWA ONE</div>
+                </div>
+                <div className="expiry">
+                  <div className="label">Valid Thru</div>
+                  <div className="value">12/29</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BACK */}
+          <div className="face back" aria-hidden="true">
+            <div className="paint backTone" />
+            <div className="rim" />
+            <div className="magstripe" />
+            <div className="backtxt">NORWA • Secure • Transparent • Global</div>
+          </div>
+        </div>
+      </div>
+
       <style jsx>{`
-        .wrap{display:flex;justify-content:center;align-items:center}
-        .canvasRoot{width:360px;height:226px}
-        @media (max-width:420px){.canvasRoot{width:300px;height:188px}}
+        /* Smooth variable rotation (prevents transform jitter) */
+        @property --ry { syntax: '<number>'; inherits: false; initial-value: 0; }
+        @property --lx { syntax: '<number>'; inherits: false; initial-value: 20; } /* light x */
+        @property --ly { syntax: '<number>'; inherits: false; initial-value: 40; } /* light y */
+
+        .wrap { display:flex; justify-content:center; align-items:center; padding:16px; }
+        .stage { perspective: 1600px; }
+
+        .card3d{
+          --ry: 0;
+          position: relative;
+          width: 360px; height: 226px;
+          transform-style: preserve-3d;
+          transform: rotateX(8deg) rotateY(calc(var(--ry) * 1deg));
+          animation: spin 12s linear infinite forwards, lights 6s ease-in-out infinite alternate;
+          filter: drop-shadow(0 36px 40px rgba(0,0,0,.45));
+        }
+
+        /* Faces */
+        .face{
+          position:absolute; inset:0; border-radius:20px; overflow:hidden;
+          backface-visibility: hidden;
+          box-shadow:
+            inset 0 0 0 1px rgba(255,255,255,.06),
+            0 8px 22px rgba(0,0,0,.28);
+        }
+        .back{ transform: rotateY(180deg); }
+
+        /* Metallic red paint with coordinated highlight using --ry */
+        .paint, .paint.backTone{
+          position:absolute; inset:-1px; border-radius:22px;
+          background:
+            radial-gradient(110% 90% at calc(var(--lx)*1%) calc(var(--ly)*1%), rgba(255,255,255,.22), rgba(255,255,255,0) 55%),
+            linear-gradient(135deg, #8f0d27 0%, #c61637 32%, #ff2a4d 55%, #b31332 78%, #661022 100%);
+        }
+        .paint.backTone{
+          background:
+            radial-gradient(100% 80% at calc((100 - var(--lx))*1%) calc((100 - var(--ly))*1%), rgba(255,255,255,.12), rgba(255,255,255,0) 60%),
+            linear-gradient(135deg, #5b0d1d 0%, #95112c 40%, #d01b41 70%, #7a0f26 100%);
+        }
+
+        /* Subtle rim to add thickness */
+        .rim{
+          position:absolute; inset:0; border-radius:20px; pointer-events:none;
+          box-shadow:
+            inset 0 0 0 1px rgba(255,255,255,.10),
+            inset 0 0 0 2px rgba(0,0,0,.22);
+        }
+
+        /* Holographic foil specks for realism */
+        .foil{
+          position:absolute; inset:0; mix-blend-mode:screen; opacity:.35; pointer-events:none;
+          background:
+            radial-gradient(6px 2px at 12% 18%, rgba(255,255,255,.5), rgba(255,255,255,0) 70%),
+            radial-gradient(10px 3px at 82% 16%, rgba(255,255,255,.32), rgba(255,255,255,0) 70%),
+            radial-gradient(8px 3px at 72% 78%, rgba(255,255,255,.28), rgba(255,255,255,0) 70%);
+          filter: blur(.2px);
+          animation: foilPulse 5.4s ease-in-out infinite;
+        }
+
+        /* Moving sheen strip synced to rotation */
+        .sheen{
+          position:absolute; inset:0; pointer-events:none; mix-blend-mode:screen;
+          background:
+            linear-gradient( 100deg,
+              rgba(255,255,255,0) 0%,
+              rgba(255,255,255,.16) 50%,
+              rgba(255,255,255,0) 100%
+            );
+          transform: translateX(calc((var(--ry) - 180) * 0.9%)) rotate(2deg);
+          opacity:.65;
+        }
+
+        .content { position:relative; display:flex; flex-direction:column; height:100%; z-index:5; }
+        .row { display:flex; align-items:center; }
+        .row.top { justify-content:space-between; padding:16px 18px 0 18px; }
+        .brand { letter-spacing:.24em; font-weight:800; font-size:14px; color:#fff; text-shadow:0 0 16px rgba(255,64,64,.24) }
+        .number {
+          margin:24px 18px 0 18px; font-size:22px; letter-spacing:.1em;
+          color:#fff; font-weight:700; text-shadow:0 2px 10px rgba(0,0,0,.45)
+        }
+        .row.bottom { justify-content:space-between; gap:14px; align-items:flex-end; padding:22px 18px }
+        .chip {
+          width:46px; height:34px; border-radius:8px;
+          background: linear-gradient(180deg,#ffdca8,#a87f36);
+          box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+          display:grid; grid-template-rows:repeat(5,1fr); gap:2px; padding:4px
+        }
+        .chip-line { height:2px; background:rgba(0,0,0,.35); border-radius:1px }
+        .holder,.expiry{ display:flex; flex-direction:column; align-items:flex-start }
+        .label{ font-size:10px; color:rgba(255,255,255,.75); letter-spacing:.12em; text-transform:uppercase }
+        .value{ font-size:14px; color:#fff; font-weight:700; margin-top:2px }
+
+        /* Back face */
+        .magstripe {
+          position:absolute; left:0; right:0; top:26px; height:44px;
+          background: linear-gradient(180deg, #0b0b0b, #232323);
+          opacity:.92;
+        }
+        .backtxt {
+          position:absolute; bottom:16px; right:18px;
+          color: rgba(255,255,255,.82); font-size:12px; letter-spacing:.08em;
+        }
+
+        /* Motion + light animations */
+        @keyframes spin { to { --ry: 360; } }
+        @keyframes lights {
+          0%   { --lx: 18; --ly: 42; }
+          50%  { --lx: 82; --ly: 22; }
+          100% { --lx: 30; --ly: 70; }
+        }
+        @keyframes foilPulse { 0%,100%{opacity:.28} 50%{opacity:.4} }
+
+        /* Reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+          .card3d { animation: none; transform: rotateX(6deg) rotateY(12deg); }
+          .sheen, .foil { animation: none; }
+        }
+
+        @media (max-width:420px){
+          .card3d{ width:300px;height:188px }
+          .number{ font-size:20px }
+        }
       `}</style>
     </div>
   );
