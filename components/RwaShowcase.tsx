@@ -15,11 +15,11 @@ type Rwa = {
 };
 
 const DATA: Rwa[] = [
-  { id: 're1', title: 'Income Real Estate', blurb: 'Tokenized rental streams with audited cashflows. Quarterly distributions in SOL.', tag: 'Real Estate', img: undefined, apy: '5–8%', supply: 'TBA', floor: '1 NORWA' },
-  { id: 'mt1', title: 'Precious Metals', blurb: 'Gold & silver vaulted with third-party attestations. 1:1 backed tokens.', tag: 'Metals', img: undefined, apy: '—', supply: 'Open', floor: '0.01 oz' },
-  { id: 'en1', title: 'Energy Credits', blurb: 'Renewable energy certificates bridged with oracles. Settlement on Solana.', tag: 'Energy', img: undefined, apy: '—', supply: 'Seasonal', floor: '1 REC' },
-  { id: 'ar1', title: 'Fine Art Shares', blurb: 'Curated artworks with fractional access and insured custody.', tag: 'Art', img: undefined, apy: '—', supply: 'Capped', floor: '1 share' },
-  { id: 'co1', title: 'Agricultural Commodities', blurb: 'On-chain warehouse receipts for grain and softs.', tag: 'Commodities', img: undefined, apy: '—', supply: 'Variable', floor: '1 unit' },
+  { id: 're1', title: 'Income Real Estate', blurb: 'Tokenized rental streams with audited cashflows. Quarterly distributions in SOL.', tag: 'Real Estate', img: '/assets/rwa-real-estate.svg', apy: '5–8%', supply: 'TBA', floor: '1 NORWA' },
+  { id: 'mt1', title: 'Precious Metals', blurb: 'Gold & silver vaulted with third-party attestations. 1:1 backed tokens.', tag: 'Metals', img: '/assets/rwa-metals.svg', apy: '—', supply: 'Open', floor: '0.01 oz' },
+  { id: 'en1', title: 'Energy Credits', blurb: 'Renewable energy certificates bridged with oracles. Settlement on Solana.', tag: 'Energy', img: '/assets/rwa-energy.svg', apy: '—', supply: 'Seasonal', floor: '1 REC' },
+  { id: 'ar1', title: 'Fine Art Shares', blurb: 'Curated artworks with fractional access and insured custody.', tag: 'Art', img: '/assets/rwa-art.svg', apy: '—', supply: 'Capped', floor: '1 share' },
+  { id: 'co1', title: 'Agricultural Commodities', blurb: 'On-chain warehouse receipts for grain and softs.', tag: 'Commodities', img: '/assets/rwa-agri.svg', apy: '—', supply: 'Variable', floor: '1 unit' },
 ];
 
 const TABS = ['All','Real Estate','Metals','Energy','Art','Commodities'] as const;
@@ -99,7 +99,7 @@ function Card({ item }: { item: Rwa }) {
               style={{background:'linear-gradient(135deg,#ff8aa3,#cf1b4a)'}} />
           </div>
           {item.img && (
-            <Image src={item.img} alt={item.title} fill className="object-cover opacity-70 mix-blend-overlay" />
+            <Image src={item.img} alt={item.title} fill className="object-cover opacity-80 mix-blend-overlay" />
           )}
         </div>
         <div className="p-4">
