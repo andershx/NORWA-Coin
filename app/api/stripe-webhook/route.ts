@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { addToTotalUsd } from '@/lib/kv';
 
+/**
+ * Next.js 14 App Router:
+ * - Do NOT export `config` here (deprecated). Using route segment config instead.
+ * - We read the raw body via `req.text()` to verify Stripe signatures.
+ */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +40,3 @@ export async function POST(req: NextRequest) {
   }
   return NextResponse.json({ received: true });
 }
-
-export const config = {
-  api: { bodyParser: false },
-};
