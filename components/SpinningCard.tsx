@@ -49,21 +49,29 @@ export default function SpinningCard() {
         const c = document.createElement('canvas');
         c.width = 1024; c.height = 512;
         const ctx = c.getContext('2d');
-        const g = ctx.createLinearGradient(0, 0, 1024, 512);
-        g.addColorStop(0, '#1a0f14');     // dark red
-        g.addColorStop(0.35, '#3b0f1e');  // deeper red
-        g.addColorStop(0.6, '#0d0f16');   // dark blue-ish
-        g.addColorStop(1, '#101216');     // near-black
-        ctx.fillStyle = g;
-        ctx.fillRect(0, 0, c.width, c.height);
-        // soft vignettes
-        ctx.globalCompositeOperation = 'lighter';
-        for (let i=0;i<3;i++){
-          const rg = ctx.createRadialGradient(200+i*300, 120+i*120, 20, 200+i*300, 120+i*120, 380);
-          rg.addColorStop(0, 'rgba(255,80,100,0.22)');
-          rg.addColorStop(1, 'rgba(0,0,0,0)');
-          ctx.fillStyle = rg; ctx.beginPath(); ctx.arc(200+i*300, 120+i*120, 380, 0, Math.PI*2); ctx.fill();
+
+        if (ctx) {
+          const g = ctx.createLinearGradient(0, 0, 1024, 512);
+          g.addColorStop(0, '#1a0f14');     // dark red
+          g.addColorStop(0.35, '#3b0f1e');  // deeper red
+          g.addColorStop(0.6, '#0d0f16');   // dark blue-ish
+          g.addColorStop(1, '#101216');     // near-black
+          ctx.fillStyle = g;
+          ctx.fillRect(0, 0, c.width, c.height);
+
+          // soft vignettes
+          ctx.globalCompositeOperation = 'lighter';
+          for (let i=0;i<3;i++){
+            const cx = 200+i*300;
+            const cy = 120+i*120;
+            const rg = ctx.createRadialGradient(cx, cy, 20, cx, cy, 380);
+            rg.addColorStop(0, 'rgba(255,80,100,0.22)');
+            rg.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = rg;
+            ctx.beginPath(); ctx.arc(cx, cy, 380, 0, Math.PI*2); ctx.fill();
+          }
         }
+
         const tex = new THREE.CanvasTexture(c);
         tex.mapping = THREE.EquirectangularReflectionMapping;
         tex.colorSpace = THREE.SRGBColorSpace;
@@ -133,8 +141,7 @@ export default function SpinningCard() {
       loader.load('/logo.svg',
         (tex) => {
           tex.colorSpace = THREE.SRGBColorSpace;
-          const aspect = 1; // square-ish logo
-          const w = 0.42, h = w / aspect;
+          const w = 0.42;
           const plane = new THREE.Mesh(
             new THREE.PlaneGeometry(w, w),
             new THREE.MeshPhysicalMaterial({
@@ -154,17 +161,19 @@ export default function SpinningCard() {
         () => { /* ignore load errors, card still renders */ }
       );
 
-      // Micro-scratches normal
+      // Micro-scratches normal (guard ctx)
       const nCan = document.createElement('canvas');
       nCan.width = nCan.height = 256;
       const nctx = nCan.getContext('2d');
-      nctx.fillStyle = '#7f7fff';
-      nctx.fillRect(0,0,256,256);
-      nctx.globalAlpha = 0.1;
-      nctx.strokeStyle = '#8f8fff';
-      for (let i=0;i<220;i++){
-        const y = Math.random()*256;
-        nctx.beginPath(); nctx.moveTo(0,y); nctx.lineTo(256,y+(Math.random()*2-1)); nctx.stroke();
+      if (nctx) {
+        nctx.fillStyle = '#7f7fff';
+        nctx.fillRect(0,0,256,256);
+        nctx.globalAlpha = 0.1;
+        nctx.strokeStyle = '#8f8fff';
+        for (let i=0;i<220;i++){
+          const y = Math.random()*256;
+          nctx.beginPath(); nctx.moveTo(0,y); nctx.lineTo(256,y+(Math.random()*2-1)); nctx.stroke();
+        }
       }
       const normalTex = new THREE.CanvasTexture(nCan);
       normalTex.wrapS = normalTex.wrapT = THREE.RepeatWrapping;
