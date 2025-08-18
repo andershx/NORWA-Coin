@@ -77,7 +77,7 @@ export default function RaiseButton() {
             ${total !== null ? total.toLocaleString() : '—'}
           </div>
           <div className="text-xs mt-2" style={{color:'var(--muted)'}}>
-            Updates automatically when new payments complete.
+            Starts at $158,000 and updates automatically when new payments complete.
           </div>
         </div>
       </div>

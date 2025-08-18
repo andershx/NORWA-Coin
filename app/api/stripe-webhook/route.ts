@@ -3,9 +3,9 @@ import { stripe } from '@/lib/stripe';
 import { addToTotalUsd } from '@/lib/kv';
 
 /**
- * Next.js 14 App Router:
- * - Do NOT export `config` here (deprecated). Using route segment config instead.
- * - We read the raw body via `req.text()` to verify Stripe signatures.
+ * Next.js 14 App Router compatible:
+ * - No deprecated `export const config`.
+ * - Reads raw body via `req.text()` for Stripe signature verification.
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

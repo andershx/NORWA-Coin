@@ -4,9 +4,7 @@ import { useEffect, useState } from 'react';
 export default function ThankYouPage(){
   const [ok, setOk] = useState(false);
 
-  useEffect(() => {
-    setOk(true);
-  }, []);
+  useEffect(() => { setOk(true); }, []);
 
   return (
     <main>
