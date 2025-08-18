@@ -4,14 +4,14 @@ import { useEffect, useState } from 'react';
 export default function RaiseButton() {
   const [amount, setAmount] = useState(25);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState<number | null>(null);
+  const [total, setTotal] = useState<number>(0); // default 0 instead of null
 
   useEffect(() => {
     const load = async () => {
       try {
         const res = await fetch('/api/raise/total', { cache: 'no-store' });
         const data = await res.json();
-        setTotal(data.totalUsd);
+        if (typeof data.totalUsd === 'number') setTotal(data.totalUsd);
       } catch (e) {
         console.error('Failed to load total', e);
       }
@@ -74,10 +74,10 @@ export default function RaiseButton() {
         <div className="rounded-2xl border border-[#2a3148] bg-[#0f1422] p-5">
           <div className="text-sm" style={{color:'var(--muted)'}}>Total Money Raised</div>
           <div className="text-4xl font-extrabold mt-2">
-            ${total !== null ? total.toLocaleString() : '—'}
+            ${total.toLocaleString()}
           </div>
           <div className="text-xs mt-2" style={{color:'var(--muted)'}}>
-            Starts at $158,000 and updates automatically when new payments complete.
+            Starts at $158,350 and updates automatically when new payments complete.
           </div>
         </div>
       </div>
