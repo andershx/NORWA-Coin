@@ -13,7 +13,6 @@ export async function ensureBaseline(): Promise<number> {
 }
 
 export async function getTotalUsd(): Promise<number> {
-  // Always enforce the baseline
   return ensureBaseline();
 }
 
@@ -22,10 +21,16 @@ export async function addToTotalUsd(amountUsd: number) {
   const cents = Math.round(amountUsd * 100);
   const delta = cents / 100;
   const updated = await KV.incrbyfloat(KEY, delta);
-  // Ensure we never drop below baseline due to any rounding or resets
   if (updated < BASELINE) {
     await KV.set(KEY, BASELINE);
     return BASELINE;
   }
   return updated;
+}
+
+// <-- Re-added export so /api/raise/set-total compiles
+export async function setTotalUsd(value: number) {
+  const v = Math.max(0, Math.floor(Number(value)));
+  await KV.set(KEY, v);
+  return v;
 }
