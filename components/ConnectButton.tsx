@@ -1,3 +1,37 @@
 'use client';
-import {useEffect,useState} from 'react';
-export default function ConnectButton(){const [label,setLabel]=useState('Koble lommebok');useEffect(()=>{if(!(window as any).ethereum){setLabel('Installer MetaMask')}},[]);const onClick=async()=>{const eth=(window as any).ethereum;if(!eth){window.open('https://metamask.io','_blank');return}try{const accounts=await eth.request({method:'eth_requestAccounts'});setLabel(`Tilkoblet ${accounts[0].slice(0,6)}…`)}catch{setLabel('Avbrutt')}};return <button className="btn btn-primary" onClick={onClick} aria-live="polite">{label}</button>;}
+import { useMemo } from 'react';
+import { useWallet } from '@solana/wallet-adapter-react';
+import bs58 from 'bs58';
+
+export default function ConnectButton(){
+  const { connected, connecting, publicKey, connect, disconnect, wallet } = useWallet();
+
+  const short = useMemo(() => {
+    if (!publicKey) return '';
+    const b58 = publicKey.toBase58();
+    return b58.slice(0, 4) + '…' + b58.slice(-4);
+  }, [publicKey]);
+
+  const onClick = async () => {
+    if (connected) {
+      await disconnect();
+      return;
+    }
+    try {
+      await connect();
+    } catch (e) {
+      console.error('Phantom connect error', e);
+      alert('Please install Phantom (phantom.app) and try again.');
+    }
+  };
+
+  return (
+    <button
+      className="btn btn-primary"
+      onClick={onClick}
+      aria-label={connected ? 'Disconnect Phantom' : 'Connect Phantom'}
+    >
+      {connecting ? 'Connecting…' : connected ? `Phantom ${short}` : 'Connect Phantom'}
+    </button>
+  );
+}
