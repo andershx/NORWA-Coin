@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 
-// Inline X (Twitter) icon — no external packages
 function XIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" {...props}>
@@ -12,33 +11,14 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export default function TwitterButton(){
   return (
-    <div className="tw-wrap" role="navigation" aria-label="NORWA social links">
-      <Link
-        href="https://x.com/NORWAcoin_sol"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="tw-btn"
-        aria-label="Open NORWA on X (Twitter)"
-      >
-        <XIcon className="icon" />
-      </Link>
-
-      <style jsx>{`
-        .tw-wrap{ display:inline-block; }
-        .tw-btn{
-          display: inline-grid;
-          place-items: center;
-          width: 28px; height: 28px;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.08);
-          border: 1px solid rgba(255,255,255,0.14);
-          backdrop-filter: blur(8px);
-          box-shadow: 0 6px 18px rgba(0,0,0,0.24);
-          transition: transform .15s ease, background .15s ease, border-color .15s ease;
-        }
-        .tw-btn:hover{ transform: translateY(-1px) scale(1.03); background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.24) }
-        .icon{ width: 16px; height: 16px; color: #1DA1F2; }
-      `}</style>
-    </div>
+    <a
+      href="https://x.com/NORWAcoin_sol"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-grid place-items-center w-8 h-8 rounded-full bg-white/10 border border-white/20 backdrop-blur hover:bg-white/20 transition"
+      aria-label="Open NORWA on X (Twitter)"
+    >
+      <XIcon className="w-4 h-4 text-[#1DA1F2]" />
+    </a>
   );
 }
