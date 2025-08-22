@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useEffect, useState } from 'react';
 import { useWallet } from '@solana/wallet-adapter-react';
 
 declare global {
@@ -9,39 +9,32 @@ declare global {
   }
 }
 
-function isPhantomAvailable() {
-  // Desktop extension
+function phantomInstalled() {
   const w = typeof window !== 'undefined' ? window : ({} as any);
-  const ext = w?.solana?.isPhantom || w?.phantom?.solana?.isPhantom;
-  return Boolean(ext);
+  return Boolean(w?.solana?.isPhantom || w?.phantom?.solana?.isPhantom);
 }
 
 function isMobile() {
   if (typeof navigator === 'undefined') return false;
-  const ua = navigator.userAgent || '';
-  return /Android|iPhone|iPad|iPod/i.test(ua);
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
 }
 
-function phantomInstallLink() {
-  // Official install page
+function installLink() {
   return 'https://phantom.app/';
 }
 
-function phantomOpenAppLink() {
-  // Universal link to open Phantom in-app browser to your site
+function openInPhantomLink() {
   const site = process.env.NEXT_PUBLIC_SITE_URL || (typeof window !== 'undefined' ? window.location.origin : '');
-  if (!site) return 'https://phantom.app/';
-  // Open in Phantom's browser
-  return `https://phantom.app/ul/browse/${encodeURIComponent(site)}`;
+  return site ? `https://phantom.app/ul/browse/${encodeURIComponent(site)}` : 'https://phantom.app/';
 }
 
-export default function ConnectButton(){
+export default function ConnectButton() {
   const { connected, connecting, publicKey, connect, disconnect } = useWallet();
-  const [available, setAvailable] = useState<boolean>(false);
+  const [hasPhantom, setHasPhantom] = useState(false);
 
   useEffect(() => {
-    setAvailable(isPhantomAvailable());
-    const id = setInterval(() => setAvailable(isPhantomAvailable()), 1500);
+    setHasPhantom(phantomInstalled());
+    const id = setInterval(() => setHasPhantom(phantomInstalled()), 1500);
     return () => clearInterval(id);
   }, []);
 
@@ -51,41 +44,34 @@ export default function ConnectButton(){
     return b58.slice(0, 4) + '…' + b58.slice(-4);
   }, [publicKey]);
 
-  const onClick = async () => {
+  const handleClick = async () => {
     if (connected) {
       await disconnect();
       return;
     }
-    if (!available) {
-      // No Phantom detected; show install/open options by navigating instead of alert
-      const url = isMobile() ? phantomOpenAppLink() : phantomInstallLink();
+    if (!hasPhantom) {
+      const url = isMobile() ? openInPhantomLink() : installLink();
       window.open(url, '_blank', 'noopener,noreferrer');
       return;
     }
     try {
       await connect();
     } catch (e) {
-      console.error('Phantom connect error', e);
+      console.error('Phantom connect error:', e);
     }
   };
 
-  // Render different states
-  if (!available && !connected) {
-    // Offer a clear install/open action
-    const url = isMobile() ? phantomOpenAppLink() : phantomInstallLink();
+  if (!hasPhantom && !connected) {
+    const url = isMobile() ? openInPhantomLink() : installLink();
     return (
-      <a href={url} target="_blank" rel="noreferrer" className="btn btn-primary" aria-label="Install Phantom">
+      <a href={url} target="_blank" rel="noreferrer" className="btn btn-primary">
         {isMobile() ? 'Open in Phantom' : 'Install Phantom'}
       </a>
     );
   }
 
   return (
-    <button
-      className="btn btn-primary"
-      onClick={onClick}
-      aria-label={connected ? 'Disconnect Phantom' : 'Connect Phantom'}
-    >
+    <button className="btn btn-primary" onClick={handleClick}>
       {connecting ? 'Connecting…' : connected ? `Phantom ${short}` : 'Connect Phantom'}
     </button>
   );
