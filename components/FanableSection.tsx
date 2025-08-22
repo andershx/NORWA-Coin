@@ -1,46 +1,71 @@
 'use client';
 import { motion } from 'framer-motion';
 
-const FanableSection = () => {
-  const logo = process.env.NEXT_PUBLIC_FANABLE_LOGO_URL || '/fanable-logo.png';
-  const items = (process.env.NEXT_PUBLIC_FANABLE_ITEM_IMAGES?.split(',') ?? [
-    'https://placehold.co/300x200/FFD700/000?text=Item+1',
-    'https://placehold.co/300x200/FFD700/000?text=Item+2',
-    'https://placehold.co/300x200/FFD700/000?text=Item+3',
-  ]).map((url) => url.trim());
-
+export default function FanableSection() {
   return (
-    <motion.a
-      href="https://fanable.io"
-      target="_blank"
-      rel="noopener noreferrer"
-      whileHover={{ scale: 1.03 }}
-      className="block rounded-2xl p-8 my-16 shadow-lg bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black text-center cursor-pointer"
-    >
-      <motion.img
-        src={logo}
-        alt="Fanable Logo"
-        className="mx-auto mb-6 h-16 drop-shadow-lg"
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      />
-      <h2 className="text-3xl font-extrabold mb-4">Explore the Fanable Marketplace</h2>
-      <p className="mb-8 text-lg">Real world assets, collectibles and more — now partnered with NORWA Coin</p>
-
-      <div className="flex justify-center gap-6 overflow-x-auto pb-4">
-        {items.map((url, i) => (
+    <section className="relative w-full py-20 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-black">
+      <div className="max-w-6xl mx-auto text-center px-6">
+        <motion.img
+          src="https://fanable.io/logo192.png"
+          alt="Fanable Logo"
+          className="mx-auto mb-8 w-32 h-32"
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        />
+        <motion.h2
+          className="text-4xl font-extrabold mb-6"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.8 }}
+        >
+          Explore the Fanable.io Market
+        </motion.h2>
+        <motion.p
+          className="text-lg mb-8 max-w-2xl mx-auto"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.8 }}
+        >
+          Discover exclusive items and experiences with our partner{' '}
+          <span className="font-semibold">Fanable.io</span>. Own a piece of
+          what you love.
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.6, duration: 0.6 }}
+        >
+          <a
+            href="https://fanable.io"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block bg-black text-yellow-400 font-semibold px-8 py-4 rounded-xl shadow-lg hover:scale-105 transform transition"
+          >
+            Visit Fanable.io
+          </a>
+        </motion.div>
+        <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-8">
           <motion.img
-            key={i}
-            src={url}
-            alt={`Fanable item ${i+1}`}
-            className="rounded-xl w-48 h-32 object-cover shadow-md"
-            whileHover={{ scale: 1.08 }}
+            src="https://fanable.io/assets/example1.jpg"
+            alt="Fanable Item 1"
+            className="rounded-xl shadow-lg"
+            whileHover={{ scale: 1.05 }}
           />
-        ))}
+          <motion.img
+            src="https://fanable.io/assets/example2.jpg"
+            alt="Fanable Item 2"
+            className="rounded-xl shadow-lg"
+            whileHover={{ scale: 1.05 }}
+          />
+          <motion.img
+            src="https://fanable.io/assets/example3.jpg"
+            alt="Fanable Item 3"
+            className="rounded-xl shadow-lg"
+            whileHover={{ scale: 1.05 }}
+          />
+        </div>
       </div>
-    </motion.a>
+    </section>
   );
-};
-
-export default FanableSection;
+}
