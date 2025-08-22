@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 export default function RaiseButton() {
   const [amount, setAmount] = useState(25);
   const [loading, setLoading] = useState(false);
-  const [total, setTotal] = useState<number>(0); // default 0 instead of null
+  const [total, setTotal] = useState<number>(158.355); // default 0 instead of null
 
   useEffect(() => {
     const load = async () => {
