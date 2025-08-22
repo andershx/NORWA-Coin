@@ -7,6 +7,7 @@ import ConnectButton from '@/components/ConnectButton';
 import SpinningCard from '@/components/SpinningCard';
 import RwaShowcase from '@/components/RwaShowcase';
 import RaiseButton from '@/components/RaiseButton';
+import TwitterButton from "@/components/TwitterButton";
 
 
 export default function Home(){return(<main>
@@ -38,6 +39,12 @@ export default function Home(){return(<main>
   </div>
 </section>
 
+  <div className="fixed top-4 right-4 z-50">
+  <TwitterButton />
+</div>
+
+
+  
   <RwaShowcase />
 
 
